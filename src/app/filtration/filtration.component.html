@@ -1,0 +1,18 @@
+<form [formGroup]="tableFilter" >
+  <label for="authors-select">Choose author: </label>
+  <select *ngIf="authors$" formControlName = "filterAuthor" name="authors-name" id="authors-select">
+    <option *ngFor="let author of (authors$ | async)"
+            value="{{author.id}}">{{author.firstName}} {{author.lastName}}</option>
+  </select><br><br>
+
+  <label for="read-on-filter">Filter books by read on: </label>
+  <input formControlName="filterReadOn" type="number" id="read-on-filter"
+         placeholder="Enter read on year"><br><br>
+
+  <label for="page-count-filter">Filter books by page count: </label>
+  <input formControlName="filterPageCount" type="number" id="page-count-filter"
+         placeholder="Enter page count"><br><br>
+
+</form>
+
+<app-table [option]="selectedInput$ | async" [readOn]="readOnInput$ | async" [pageCount]="pageCountInput$ | async"></app-table>

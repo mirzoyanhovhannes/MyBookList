@@ -1,0 +1,13 @@
+table {
+  width: 100%;
+  table-layout: fixed;
+}
+th{
+  background-color: cornflowerblue;
+}
+tr{
+  background-color: antiquewhite;
+}
+table, th, td { border: solid 2px; /*#DDD;*/
+  border-collapse: collapse; padding: 2px 3px; text-align: center;
+}
