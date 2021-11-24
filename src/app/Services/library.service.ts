@@ -3,6 +3,7 @@ import {Author} from "../author";
 import {Book} from "../book";
 import {Observable} from "rxjs";
 import {filter, map, tap} from "rxjs/operators";
+import {FilterModel} from "../filter.model";
 
 @Injectable({
   providedIn: 'root'
@@ -37,8 +38,23 @@ export class LibraryService {
     )
   }
 
-  filterBooks(books: Observable<Book[]>, authorId: number, readOn: number, pageCount: number) {
+  filterBooks(books: Observable<Book[]>, filterData: FilterModel | null) {
 
-    return this.filterBooksByPageCount(this.filterBooksByReadOn(this.filterBooksByAuthorId(books,authorId),readOn), pageCount);
+    if(filterData === null){
+      return  books;
+    }
+
+    if(filterData.author) {
+      books = this.filterBooksByAuthorId(books, +filterData.author);
+    }
+    if(filterData.readOn) {
+      books = this.filterBooksByReadOn(books, +filterData.readOn);
+    }
+    if(filterData.pageCount) {
+      books = this.filterBooksByPageCount(books, +filterData.pageCount);
+    }
+
+    return books;
+
   }
 }

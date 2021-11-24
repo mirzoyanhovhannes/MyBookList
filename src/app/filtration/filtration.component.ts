@@ -4,6 +4,7 @@ import {AuthorService} from "../Services/author.service";
 import {fromEvent, Observable} from "rxjs";
 import {Author} from "../author";
 import {debounceTime, map, tap} from "rxjs/operators";
+import {FilterModel} from "../filter.model";
 
 @Component({
   selector: 'app-filtration',
@@ -15,23 +16,18 @@ export class FiltrationComponent implements OnInit {
   tableFilter: FormGroup = new FormGroup({});
   authors$: Observable<Author[]> = this.authorService.getAuthors();
 
-  selectedInput$?: Observable<any>;
-  readOnInput$?: Observable<any>;
-  pageCountInput$?:Observable<any>;
+  filterData$?: Observable<FilterModel>;
 
   constructor(private authorService: AuthorService, private fb: FormBuilder) { }
 
   ngOnInit(): void {
     this.tableFilter = this.fb.group({
-      filterAuthor: [],
-      filterReadOn: [],
-      filterPageCount: []
+      author: [],
+      readOn: [],
+      pageCount: []
     })
 
-    this.selectedInput$ = this.tableFilter.get('filterAuthor')?.valueChanges;
-    this.readOnInput$ = this.tableFilter.get('filterReadOn')?.valueChanges;
-    this.pageCountInput$ = this.tableFilter.get('filterPageCount')?.valueChanges;
-
+    this.filterData$ = this.tableFilter.valueChanges.pipe(debounceTime(1000));
   }
 
 }

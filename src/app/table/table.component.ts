@@ -16,6 +16,7 @@ import {first, map, tap} from "rxjs/operators";
 import {LibraryService} from "../Services/library.service";
 import {RawElement} from "../rawElement";
 import {Observable, zip} from "rxjs";
+import {FilterModel} from "../filter.model";
 
 @Component({
   selector: 'app-table',
@@ -25,12 +26,8 @@ import {Observable, zip} from "rxjs";
 export class TableComponent implements OnInit, OnChanges {
 
   books: Observable<Book[]> = this.getBooks();
-  authors: Author[] = [];
   tableElements: RawElement[] = [];
-  filteredData = this.getBooks();
-  @Input() option?: string;
-  @Input() readOn?: number;
-  @Input() pageCount?: number;
+  @Input() filterData?: FilterModel | null;
 
   constructor(private bookService: BookService, private authorService: AuthorService, private libraryService: LibraryService) {
   }
@@ -72,31 +69,16 @@ export class TableComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes:SimpleChanges): void{
-    const authorId  = changes['option']?.currentValue;
-    const readOn = changes['readOn']?.currentValue;
-    const pageCount = changes['pageCount']?.currentValue;
 
+    const filter = changes['filterData'];
 
+    let books;
 
-    if(authorId){
-      this.filteredData = this.libraryService.filterBooksByAuthorId(this.filteredData,+authorId);
-    }
+    books = this.libraryService.filterBooks(this.books,filter.currentValue);
 
-    if(readOn){
-      this.filteredData = this.libraryService.filterBooksByReadOn(this.filteredData,+readOn);
-    }
-
-    if(pageCount){
-      this.filteredData = this.libraryService.filterBooksByPageCount(this.filteredData,+pageCount);
-    }
-
-    this.createTable(this.filteredData);
+    this.createTable(books);
 
   }
 
-  reset(){
-    this.filteredData = this.books;
-    this.createTable(this.filteredData);
-  }
 
 }
