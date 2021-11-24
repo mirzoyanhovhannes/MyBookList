@@ -15,7 +15,7 @@ import {AuthorService} from "../Services/author.service";
 import {first, map, tap} from "rxjs/operators";
 import {LibraryService} from "../Services/library.service";
 import {RawElement} from "../rawElement";
-import {Observable, zip} from "rxjs";
+import {Observable, of, zip} from "rxjs";
 import {FilterModel} from "../filter.model";
 
 @Component({
@@ -27,7 +27,7 @@ export class TableComponent implements OnInit, OnChanges {
 
   books: Observable<Book[]> = this.getBooks();
   tableElements: RawElement[] = [];
-  @Input() filterData?: FilterModel | null;
+  @Input() filterData?: Observable<Book[]>;
 
   constructor(private bookService: BookService, private authorService: AuthorService, private libraryService: LibraryService) {
   }
@@ -70,13 +70,17 @@ export class TableComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes:SimpleChanges): void{
 
-    const filter = changes['filterData'];
+    /*const filter = changes['filterData'];
 
     let books;
 
     books = this.libraryService.filterBooks(this.books,filter.currentValue);
+*/
+    const change = changes['filterData'];
 
-    this.createTable(books);
+    change?.currentValue.subscribe(console.log);
+
+   // this.createTable(change?.currentValue);
 
   }
 

@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {Author} from "../author";
 import {Book} from "../book";
 import {Observable} from "rxjs";
-import {filter, map, tap} from "rxjs/operators";
+import {filter, map, switchMap, tap} from "rxjs/operators";
 import {FilterModel} from "../filter.model";
 
 @Injectable({
@@ -38,23 +38,32 @@ export class LibraryService {
     )
   }
 
-  filterBooks(books: Observable<Book[]>, filterData: FilterModel | null) {
+  private filterBookInService(books:Observable<Book[]>, filter: FilterModel | null){
 
-    if(filterData === null){
+    if(filter === null){
       return  books;
     }
 
-    if(filterData.author) {
-      books = this.filterBooksByAuthorId(books, +filterData.author);
+    if(filter.author) {
+      books = this.filterBooksByAuthorId(books, +filter.author);
     }
-    if(filterData.readOn) {
-      books = this.filterBooksByReadOn(books, +filterData.readOn);
+    if(filter.readOn) {
+      books = this.filterBooksByReadOn(books, +filter.readOn);
     }
-    if(filterData.pageCount) {
-      books = this.filterBooksByPageCount(books, +filterData.pageCount);
+    if(filter.pageCount) {
+      books = this.filterBooksByPageCount(books, +filter.pageCount);
     }
 
     return books;
 
+  }
+
+  filterBooks(books: Observable<Book[]>, filterData: Observable<FilterModel>) {
+
+    return filterData.pipe(
+      switchMap((value:FilterModel) => {
+         return this.filterBookInService(books,value)
+      })
+    )
   }
 }

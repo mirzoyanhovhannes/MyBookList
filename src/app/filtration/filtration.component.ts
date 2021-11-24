@@ -1,4 +1,4 @@
-import {Component, OnChanges, OnInit, SimpleChanges} from '@angular/core';
+import {Component, OnInit, EventEmitter, Output} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {AuthorService} from "../Services/author.service";
 import {fromEvent, Observable} from "rxjs";
@@ -16,7 +16,7 @@ export class FiltrationComponent implements OnInit {
   tableFilter: FormGroup = new FormGroup({});
   authors$: Observable<Author[]> = this.authorService.getAuthors();
 
-  filterData$?: Observable<FilterModel>;
+  @Output()filterData = new EventEmitter<Observable<FilterModel>>();
 
   constructor(private authorService: AuthorService, private fb: FormBuilder) { }
 
@@ -27,7 +27,7 @@ export class FiltrationComponent implements OnInit {
       pageCount: []
     })
 
-    this.filterData$ = this.tableFilter.valueChanges.pipe(debounceTime(1000));
+    this.filterData.emit(this.tableFilter.valueChanges.pipe(debounceTime(1000)));
   }
 
 }
