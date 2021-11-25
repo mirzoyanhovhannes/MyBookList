@@ -1,22 +1,15 @@
 import {
-  AfterContentChecked,
-  AfterContentInit,
-  AfterViewInit,
   Component,
-  Input,
-  OnChanges, OnDestroy,
+  OnDestroy,
   OnInit,
-  SimpleChanges
 } from '@angular/core';
 import {Book} from "../models/book";
-import {Author} from "../models/author";
 import {BookService} from "../Services/book.service";
 import {AuthorService} from "../Services/author.service";
-import {first, map, takeUntil, tap} from "rxjs/operators";
+import {map, takeUntil} from "rxjs/operators";
 import {LibraryService} from "../Services/library.service";
 import {RawElement} from "../models/rawElement";
 import {Observable, of, Subject, zip} from "rxjs";
-import {FilterModel} from "../models/filter.model";
 import {CommunicationService} from "../Services/communication.service";
 
 @Component({
@@ -35,7 +28,7 @@ export class TableComponent implements OnInit, OnDestroy{
   }
 
   ngOnInit(): void {
-    this.comService.getFilteredData().pipe(takeUntil(this.destroy$))
+    this.comService.filteredSubject$.pipe(takeUntil(this.destroy$))
       .subscribe( value => this.createTable(this.libraryService.filterBookInService(this.books,value)));
 
   }
@@ -50,7 +43,7 @@ export class TableComponent implements OnInit, OnDestroy{
           pageCount: item.pageCount
         }) as RawElement)
       })
-    ).subscribe(val => this.tableElements = val)
+    ).pipe(takeUntil(this.destroy$)).subscribe(val => this.tableElements = val)
   }
 
   ngOnDestroy(){

@@ -6,12 +6,14 @@ import {FilterModel} from "../models/filter.model";
   providedIn: 'root'
 })
 export class CommunicationService {
-  filterSubject = new BehaviorSubject<FilterModel>({} as FilterModel);
+  private filterSubject = new BehaviorSubject<FilterModel>({} as FilterModel);
+  filteredSubject$ = this.filterSubject.asObservable();
   constructor() { }
 
 
-  getFilteredData(){
-    return this.filterSubject.asObservable();
+  setSubjectValue(data: FilterModel){
+    this.filterSubject.next(data);
   }
+
 
 }

@@ -1,10 +1,9 @@
-import {Component, OnInit, EventEmitter, Output} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
+import {Component, OnInit, } from '@angular/core';
+import {FormBuilder,FormGroup} from "@angular/forms";
 import {AuthorService} from "../Services/author.service";
-import {BehaviorSubject, fromEvent, Observable} from "rxjs";
+import {Observable} from "rxjs";
 import {Author} from "../models/author";
-import {debounceTime, map, tap} from "rxjs/operators";
-import {FilterModel} from "../models/filter.model";
+import {debounceTime} from "rxjs/operators";
 import {CommunicationService} from "../Services/communication.service";
 
 @Component({
@@ -26,7 +25,7 @@ export class FiltrationComponent implements OnInit {
       pageCount: []
     });
 
-    this.tableFilter.valueChanges.pipe(debounceTime(1000)).subscribe(value => this.comService.filterSubject.next(value));
+    this.tableFilter.valueChanges.pipe(debounceTime(1000)).subscribe(value => this.comService.setSubjectValue(value));
 
   }
 
