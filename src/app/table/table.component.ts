@@ -4,40 +4,44 @@ import {
   AfterViewInit,
   Component,
   Input,
-  OnChanges,
+  OnChanges, OnDestroy,
   OnInit,
   SimpleChanges
 } from '@angular/core';
-import {Book} from "../book";
-import {Author} from "../author";
+import {Book} from "../models/book";
+import {Author} from "../models/author";
 import {BookService} from "../Services/book.service";
 import {AuthorService} from "../Services/author.service";
-import {first, map, tap} from "rxjs/operators";
+import {first, map, takeUntil, tap} from "rxjs/operators";
 import {LibraryService} from "../Services/library.service";
-import {RawElement} from "../rawElement";
-import {Observable, of, zip} from "rxjs";
-import {FilterModel} from "../filter.model";
+import {RawElement} from "../models/rawElement";
+import {Observable, of, Subject, zip} from "rxjs";
+import {FilterModel} from "../models/filter.model";
+import {CommunicationService} from "../Services/communication.service";
 
 @Component({
   selector: 'app-table',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.css']
 })
-export class TableComponent implements OnInit, OnChanges {
+export class TableComponent implements OnInit, OnDestroy{
 
-  books: Observable<Book[]> = this.getBooks();
+  books = this.bookService.getBooks();
   tableElements: RawElement[] = [];
-  @Input() filterData?: Observable<Book[]>;
+  destroy$ = new Subject();
 
-  constructor(private bookService: BookService, private authorService: AuthorService, private libraryService: LibraryService) {
+  constructor(private bookService: BookService, private authorService: AuthorService,
+              private libraryService: LibraryService,private comService: CommunicationService) {
   }
 
   ngOnInit(): void {
-    this.createTable(this.books);
+    this.comService.getFilteredData().pipe(takeUntil(this.destroy$))
+      .subscribe( value => this.createTable(this.libraryService.filterBookInService(this.books,value)));
+
   }
 
   createTable(books: Observable<Book[]>){
-    zip(books, this.getAuthors()).pipe(
+    zip(books, this.authorService.getAuthors()).pipe(
       map(([books, authors]) => {
         return books.map(item => ({
           title: item.title,
@@ -49,40 +53,8 @@ export class TableComponent implements OnInit, OnChanges {
     ).subscribe(val => this.tableElements = val)
   }
 
-  /* async table(){
-     let booksArray:Book[] = [];
-     let authorsArray:Author[] = [];
-     await this.bookService.getBooks().toPromise().then(res => booksArray = res);
-     await this.authorService.getAuthors().toPromise().then(res => authorsArray = res);
-
-
-   }*/
-
-  getBooks() {
-    return this.bookService.getBooks()
-    // .subscribe(value => this.books = value);
+  ngOnDestroy(){
+    this.destroy$.next();
   }
-
-  getAuthors() {
-    return this.authorService.getAuthors()
-    // .subscribe( authors => this.authors = authors);
-  }
-
-  ngOnChanges(changes:SimpleChanges): void{
-
-    /*const filter = changes['filterData'];
-
-    let books;
-
-    books = this.libraryService.filterBooks(this.books,filter.currentValue);
-*/
-    const change = changes['filterData'];
-
-    change?.currentValue.subscribe(console.log);
-
-   // this.createTable(change?.currentValue);
-
-  }
-
 
 }

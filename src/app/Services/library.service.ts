@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
-import {Author} from "../author";
-import {Book} from "../book";
+import {Author} from "../models/author";
+import {Book} from "../models/book";
 import {Observable} from "rxjs";
 import {filter, map, switchMap, tap} from "rxjs/operators";
-import {FilterModel} from "../filter.model";
+import {FilterModel} from "../models/filter.model";
 
 @Injectable({
   providedIn: 'root'
@@ -38,7 +38,7 @@ export class LibraryService {
     )
   }
 
-  private filterBookInService(books:Observable<Book[]>, filter: FilterModel | null){
+   filterBookInService(books:Observable<Book[]>, filter: FilterModel | null){
 
     if(filter === null){
       return  books;
